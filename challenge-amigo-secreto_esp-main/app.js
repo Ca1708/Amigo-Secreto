@@ -2,37 +2,28 @@
 
 let listaDeAmigos = [];
 
-// Cargar datos guardados al inicio
 document.addEventListener("DOMContentLoaded", () => {
-    const datosGuardados = localStorage.getItem("amigos");
-    if (datosGuardados) {
-        listaDeAmigos = JSON.parse(datosGuardados);
-        mostrarLista();
-    }
+    localStorage.removeItem("amigos");
+    localStorage.removeItem("resultadoSorteo");
+    listaDeAmigos = [];
+    mostrarLista();
 });
 
-// Agregar un amigo a la lista y guardarlo
 function agregarAmigo() {
     let input = document.getElementById('amigo');
     let nombre = input.value.trim();
 
-    if (nombre === "") {
-        alert("Por favor, ingresa un nombre válido.");
-        return;
-    }
-    
-    if (listaDeAmigos.includes(nombre)) {
-        alert("Este nombre ya está en la lista.");
+    if (nombre === "" || listaDeAmigos.includes(nombre)) {
+        alert("Nombre inválido o duplicado.");
         return;
     }
 
     listaDeAmigos.push(nombre);
-    localStorage.setItem("amigos", JSON.stringify(listaDeAmigos)); // Guardar en LocalStorage
-    input.value = ""; 
+    localStorage.setItem("amigos", JSON.stringify(listaDeAmigos));
+    input.value = "";
     mostrarLista();
 }
 
-// Mostrar la lista de amigos en pantalla
 function mostrarLista() {
     let listaHTML = document.getElementById('listaAmigos');
     listaHTML.innerHTML = "";
@@ -40,25 +31,20 @@ function mostrarLista() {
     listaDeAmigos.forEach((amigo, index) => {
         let item = document.createElement("li");
         item.textContent = amigo;
-
-        // Botón para eliminar un nombre
         let botonEliminar = document.createElement("button");
         botonEliminar.textContent = "❌";
         botonEliminar.onclick = () => eliminarAmigo(index);
         item.appendChild(botonEliminar);
-
         listaHTML.appendChild(item);
     });
 }
 
-// Eliminar un amigo de la lista y actualizar LocalStorage
 function eliminarAmigo(index) {
     listaDeAmigos.splice(index, 1);
     localStorage.setItem("amigos", JSON.stringify(listaDeAmigos));
     mostrarLista();
 }
 
-// Realizar el sorteo asegurando que nadie se asigne a sí mismo
 function sortearAmigo() {
     if (listaDeAmigos.length < 2) {
         alert("Debe haber al menos 2 participantes para sortear.");
@@ -69,7 +55,7 @@ function sortearAmigo() {
     let disponibles = [...listaDeAmigos];
     let intentos = 0;
 
-    while (intentos < 100) { // Intentar hasta 100 veces para evitar bloqueos
+    while (intentos < 100) {
         disponibles = [...listaDeAmigos];
         asignaciones = {};
         let fallo = false;
@@ -97,7 +83,6 @@ function sortearAmigo() {
     alert("Error en el sorteo. Inténtalo nuevamente.");
 }
 
-// Mostrar el amigo secreto de la primera persona en la lista automáticamente
 function mostrarResultadoIndividual() {
     let resultado = JSON.parse(localStorage.getItem("resultadoSorteo"));
     if (!resultado) {
@@ -105,7 +90,7 @@ function mostrarResultadoIndividual() {
         return;
     }
 
-    let nombreUsuario = listaDeAmigos[0]; // Mostrar el primer usuario en la lista automáticamente
+    let nombreUsuario = listaDeAmigos[0];
     let amigoSecreto = resultado[nombreUsuario];
     
     let resultadoHTML = document.getElementById('resultado');
